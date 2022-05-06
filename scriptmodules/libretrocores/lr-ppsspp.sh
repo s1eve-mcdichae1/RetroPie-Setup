@@ -48,9 +48,9 @@ function configure_lr-ppsspp() {
         # the core needs a save file directory, use the same folder as standalone 'ppsspp'
         iniConfig " = " "" "$configdir/psp/retroarch.cfg"
         iniSet "savefile_directory" "$home/.config/ppsspp"
-        mkUserDir "$home/.config/ppsspp"
     fi
 
+    moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
     addEmulator 1 "$md_id" "psp" "$md_inst/ppsspp_libretro.so"
     addSystem "psp"
 }
