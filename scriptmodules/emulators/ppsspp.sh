@@ -171,8 +171,8 @@ function configure_ppsspp() {
         extra_params+=(--fullscreen)
     fi
 
+    mkRomDir "psp"
     if [[ "$md_mode" == "install" ]]; then
-        mkRomDir "psp"
         moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
         mkUserDir "$md_conf_root/psp/PSP"
         ln -snf "$romdir/psp" "$md_conf_root/psp/PSP/GAME"
