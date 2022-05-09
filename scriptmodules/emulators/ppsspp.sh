@@ -172,10 +172,33 @@ function configure_ppsspp() {
     fi
 
     mkRomDir "psp"
-    moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
-    mkUserDir "$md_conf_root/psp/PSP"
-    ln -snf "$romdir/psp" "$md_conf_root/psp/PSP/GAME"
+
+    if [[ "$md_mode" == "install" ]]; then
+        # link save file dir manually
+        # (replicate moveConfigDir without invoking it)
+        local from="$home/.config/ppsspp"
+        local to="$md_conf_root/psp"
+
+        mkUserDir "$to"
+        # move any old configs to the new location
+        if [[ -d "$from" && ! -h "$from" ]]; then
+            cp -a "$from/." "$to/"
+            rm -rf "$from"
+        fi
+        ln -snf "$to" "$from"
+        chown -h $user:$user "$from"
+
+        mkUserDir "$md_conf_root/psp/PSP"
+        ln -snf "$romdir/psp" "$md_conf_root/psp/PSP/GAME"
+    fi
 
     addEmulator 0 "$md_id" "psp" "pushd $md_inst; $md_inst/PPSSPPSDL ${extra_params[*]} %ROM%; popd"
     addSystem "psp"
+
+    # if we are removing the last remaining psp emu - remove the symlink
+    if [[ "$md_mode" == "remove" ]]; then
+        if [[ -h "$home/.config/ppsspp" && ! -f "$md_conf_root/psp/emulators.cfg" ]]; then
+            rm -f "$home/.config/ppsspp"
+        fi
+    fi
 }
