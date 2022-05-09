@@ -174,20 +174,7 @@ function configure_ppsspp() {
     mkRomDir "psp"
 
     if [[ "$md_mode" == "install" ]]; then
-        # link save file dir manually
-        # (replicate moveConfigDir without invoking it)
-        local from="$home/.config/ppsspp"
-        local to="$md_conf_root/psp"
-
-        mkUserDir "$to"
-        # move any old configs to the new location
-        if [[ -d "$from" && ! -h "$from" ]]; then
-            cp -a "$from/." "$to/"
-            rm -rf "$from"
-        fi
-        ln -snf "$to" "$from"
-        chown -h $user:$user "$from"
-
+        moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
         mkUserDir "$md_conf_root/psp/PSP"
         ln -snf "$romdir/psp" "$md_conf_root/psp/PSP/GAME"
     fi
