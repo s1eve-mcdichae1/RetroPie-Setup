@@ -49,19 +49,7 @@ function configure_lr-ppsspp() {
         iniConfig " = " "" "$configdir/psp/retroarch.cfg"
         iniSet "savefile_directory" "$home/.config/ppsspp"
 
-        # link save file dir manually
-        # (replicate moveConfigDir without invoking it)
-        local from="$home/.config/ppsspp"
-        local to="$md_conf_root/psp"
-
-        mkUserDir "$to"
-        # move any old configs to the new location
-        if [[ -d "$from" && ! -h "$from" ]]; then
-            cp -a "$from/." "$to/"
-            rm -rf "$from"
-        fi
-        ln -snf "$to" "$from"
-        chown -h $user:$user "$from"
+        moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
     fi
 
     addEmulator 1 "$md_id" "psp" "$md_inst/ppsspp_libretro.so"
