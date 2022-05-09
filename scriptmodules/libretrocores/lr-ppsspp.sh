@@ -48,9 +48,29 @@ function configure_lr-ppsspp() {
         # the core needs a save file directory, use the same folder as standalone 'ppsspp'
         iniConfig " = " "" "$configdir/psp/retroarch.cfg"
         iniSet "savefile_directory" "$home/.config/ppsspp"
+
+        # link save file dir manually
+        # (replicate moveConfigDir without invoking it)
+        local from="$home/.config/ppsspp"
+        local to="$md_conf_root/psp"
+
+        mkUserDir "$to"
+        # move any old configs to the new location
+        if [[ -d "$from" && ! -h "$from" ]]; then
+            cp -a "$from/." "$to/"
+            rm -rf "$from"
+        fi
+        ln -snf "$to" "$from"
+        chown -h $user:$user "$from"
     fi
 
-    moveConfigDir "$home/.config/ppsspp" "$md_conf_root/psp"
     addEmulator 1 "$md_id" "psp" "$md_inst/ppsspp_libretro.so"
     addSystem "psp"
+
+    # if we are removing the last remaining psp emu - remove the symlink
+    if [[ "$md_mode" == "remove" ]]; then
+        if [[ -h "$home/.config/ppsspp" && ! -f "$md_conf_root/psp/emulators.cfg" ]]; then
+            rm -f "$home/.config/ppsspp"
+        fi
+    fi
 }
