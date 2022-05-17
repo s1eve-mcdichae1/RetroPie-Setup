@@ -331,7 +331,6 @@ function gui_splashscreen() {
                     randomize_splashscreen
                     ;;
                 4)
-                    iniConfig "=" '"' "$configdir/all/$md_id.cfg"
                     iniSet "RANDOMIZE" "disabled"
                     default_splashscreen
                     printMsgs "dialog" "Splashscreen set to RetroPie default."
