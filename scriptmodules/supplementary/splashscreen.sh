@@ -93,31 +93,15 @@ function disable_plymouth_splashscreen() {
 }
 
 function default_splashscreen() {
-    iniConfig "=" '"' "$configdir/all/$md_id.cfg"
-    iniSet "RANDOMIZE" "disabled"
     echo "$md_inst/retropie-default.png" >/etc/splashscreen.list
-    printMsgs "dialog" "Splashscreen set to RetroPie default."
 }
 
 function enable_splashscreen() {
-    options=(
-        0 "Disable splashscreen on boot"
-        1 "Enable splashscreen on boot"
-    )
-    local cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option." 22 86 16)
-    local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    systemctl enable asplashscreen
+}
 
-    case "$choice" in
-        0)
-            systemctl disable asplashscreen
-            printMsgs "dialog" "Disabled splashscreen on boot."
-            ;;
-        1)
-            [[ ! -f /etc/splashscreen.list ]] && rp_callModule splashscreen default
-            systemctl enable asplashscreen
-            printMsgs "dialog" "Enabled splashscreen on boot."
-            ;;
-    esac
+function disable_splashscreen() {
+    systemctl disable asplashscreen
 }
 
 function configure_splashscreen() {
@@ -334,13 +318,33 @@ function gui_splashscreen() {
                     set_append_splashscreen set
                     ;;
                 2)
-                    enable_splashscreen
+                    options=(
+                        0 "Disable splashscreen on boot"
+                        1 "Enable splashscreen on boot"
+                    )
+                    local cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option." 22 86 16)
+                    local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+
+                    case "$choice" in
+                        0)
+                            disable_splashscreen
+                            printMsgs "dialog" "Disabled splashscreen on boot."
+                            ;;
+                        1)
+                            [[ ! -f /etc/splashscreen.list ]] && rp_callModule splashscreen default
+                            enable_splashscreen
+                            printMsgs "dialog" "Enabled splashscreen on boot."
+                            ;;
+                    esac
                     ;;
                 3)
                     randomize_splashscreen
                     ;;
                 4)
+                    iniConfig "=" '"' "$configdir/all/$md_id.cfg"
+                    iniSet "RANDOMIZE" "disabled"
                     default_splashscreen
+                    printMsgs "dialog" "Splashscreen set to RetroPie default."
                     ;;
                 5)
                     editFile /etc/splashscreen.list
