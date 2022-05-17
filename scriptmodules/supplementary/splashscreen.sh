@@ -281,7 +281,7 @@ function gui_splashscreen() {
         [[ -n "$(find "/etc/systemd/system/"*".wants" -type l -name "asplashscreen.service")" ]] && enabled=1
         local options=(1 "Choose splashscreen")
         if [[ "$enabled" -eq 1 ]]; then
-            options+=(2 "Show splashscreen on boot (Enabled)")
+            options+=(2 "Show splashscreen on boot (currently: Enabled)")
             iniConfig "=" '"' "$configdir/all/$md_id.cfg"
             iniGet "RANDOMIZE"
             random=1
@@ -292,7 +292,7 @@ function gui_splashscreen() {
                 options+=(3 "Splashscreen randomizer (Disabled)")
             fi
         else
-            options+=(2 "Show splashscreen on boot (Disabled)")
+            options+=(2 "Show splashscreen on boot (currently: Disabled)")
         fi
         options+=(
             4 "Use default splashscreen"
@@ -318,24 +318,14 @@ function gui_splashscreen() {
                     set_append_splashscreen set
                     ;;
                 2)
-                    options=(
-                        0 "Disable splashscreen on boot"
-                        1 "Enable splashscreen on boot"
-                    )
-                    local cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option." 22 86 16)
-                    local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
-
-                    case "$choice" in
-                        0)
-                            disable_splashscreen
-                            printMsgs "dialog" "Disabled splashscreen on boot."
-                            ;;
-                        1)
-                            [[ ! -f /etc/splashscreen.list ]] && rp_callModule splashscreen default
-                            enable_splashscreen
-                            printMsgs "dialog" "Enabled splashscreen on boot."
-                            ;;
-                    esac
+                    if [[ "$enabled" -eq 1 ]]; then
+                        disable_splashscreen
+                        printMsgs "dialog" "Disabled splashscreen on boot."
+                    else
+                        [[ ! -f /etc/splashscreen.list ]] && rp_callModule splashscreen default
+                        enable_splashscreen
+                        printMsgs "dialog" "Enabled splashscreen on boot."
+                    fi
                     ;;
                 3)
                     randomize_splashscreen
