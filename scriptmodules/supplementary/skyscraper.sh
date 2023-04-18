@@ -10,13 +10,13 @@
 #
 
 rp_module_id="skyscraper"
-rp_module_desc="Scraper for EmulationStation by Lars Muldjord"
-rp_module_licence="GPL3 https://raw.githubusercontent.com/muldjord/skyscraper/master/LICENSE"
-rp_module_repo="git https://github.com/muldjord/skyscraper :_get_branch_skyscraper"
+rp_module_desc="Scraper for EmulationStation"
+rp_module_licence="GPL3 https://raw.githubusercontent.com/detain/skyscraper/master/LICENSE"
+rp_module_repo="git https://github.com/detain/skyscraper :_get_branch_skyscraper"
 rp_module_section="opt"
 
 function _get_branch_skyscraper() {
-    download https://api.github.com/repos/muldjord/skyscraper/releases/latest - | grep -m 1 tag_name | cut -d\" -f4
+    download https://api.github.com/repos/detain/skyscraper/releases/latest - | grep -m 1 tag_name | cut -d\" -f4
 }
 
 function depends_skyscraper() {
@@ -44,6 +44,8 @@ function install_skyscraper() {
         'artwork.xml.example2'
         'artwork.xml.example3'
         'artwork.xml.example4'
+        'platforms.json'
+        'screenscraper.json'
         'tgdb_developers.json'
         'tgdb_publishers.json'
         'mameMap.csv'
@@ -233,7 +235,7 @@ function _init_config_skyscraper() {
 
         # Copy resources and readme
         local resource_file
-        for resource_file in README.md mameMap.csv tgdb_developers.json tgdb_publishers.json hints.txt; do
+        for resource_file in README.md mameMap.csv tgdb_developers.json tgdb_publishers.json platforms.json screenscraper.json hints.txt; do
             cp -f "$md_inst/$resource_file" "$scraper_conf_dir"
         done
     fi
@@ -342,7 +344,7 @@ function _scrape_chosen_skyscraper() {
     # Confirm with the user that scraping can start
     dialog --clear --colors --yes-label "Proceed" --no-label "Abort" --yesno "This will start the gathering process, which can take a long time if you have a large game collection.\n\nYou can interrupt this process anytime by pressing \ZbCtrl+C\Zn.\nProceed ?" 12 70 2>&1 >/dev/tty
     [[ ! $? -eq 0 ]] && return 1
-    
+
     local choice
 
     for choice in "${choices[@]}"; do
@@ -523,7 +525,7 @@ function gui_skyscraper() {
     while true; do
         [[ -z "$ver" ]] && ver="v(Git)"
 
-        local cmd=(dialog --backtitle "$__backtitle"  --colors --cancel-label "Exit" --help-button --no-collapse --cr-wrap --default-item "$default" --menu "   Skyscraper: game scraper by Lars Muldjord ($ver)\\n \\n" 22 60 12)
+        local cmd=(dialog --backtitle "$__backtitle"  --colors --cancel-label "Exit" --help-button --no-collapse --cr-wrap --default-item "$default" --menu "   Skyscraper: game scraper for EmulationStation ($ver)\\n \\n" 22 60 12)
 
         local options=(
             "-" "GATHER and cache resources"
